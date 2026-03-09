@@ -1,0 +1,75 @@
+name: LOGOS Interaction Log — Immutable Evidence Registry
+
+on:
+  repository_dispatch:
+    types: [governance_interaction]
+
+permissions:
+  contents: write
+
+jobs:
+  log_interaction:
+    runs-on: ubuntu-latest
+    name: Append interaction to immutable evidence log
+
+    steps:
+      - name: Checkout logos-interaction-logs (private)
+        uses: actions/checkout@v4
+        with:
+          repository: LogosGSInc/logos-interaction-logs
+          token: ${{ secrets.LOG_REPO_TOKEN }}
+          path: logs
+
+      - name: Install jq
+        run: sudo apt-get install -y jq
+
+      - name: Validate payload fields
+        run: |
+          REQUIRED_FIELDS=("timestamp" "session_id" "mode" "verdict" "drs")
+          PAYLOAD='${{ toJson(github.event.client_payload) }}'
+          for f in "${REQUIRED_FIELDS[@]}"; do
+            echo "$PAYLOAD" | jq -e --arg f "$f" 'has($f)' > /dev/null || {
+              echo "ERROR: Missing required field: $f"
+              exit 1
+            }
+          done
+          echo "Payload validation passed."
+
+      - name: Write interaction record
+        run: |
+          mkdir -p logs/interactions
+
+          TIMESTAMP=$(echo '${{ toJson(github.event.client_payload.timestamp) }}' | tr -d '"')
+          # Fallback if timestamp is empty or malformed
+          if [ -z "$TIMESTAMP" ]; then
+            TIMESTAMP=$(date -u +%Y-%m-%dT%H-%M-%SZ)
+          fi
+          SAFE_TS=$(echo "$TIMESTAMP" | sed 's/[^a-zA-Z0-9._-]/_/g')
+          FILENAME="logs/interactions/${SAFE_TS}.json"
+
+          cat > "$FILENAME" << 'LOGEOF'
+          ${{ toJson(github.event.client_payload) }}
+          LOGEOF
+
+          echo "Logged interaction: $FILENAME"
+
+      - name: Append to session index
+        run: |
+          INDEX_FILE="logs/index.jsonl"
+          ENTRY='{
+            "timestamp": ${{ toJson(github.event.client_payload.timestamp) }},
+            "session_id": ${{ toJson(github.event.client_payload.session_id) }},
+            "mode": ${{ toJson(github.event.client_payload.mode) }},
+            "verdict": ${{ toJson(github.event.client_payload.verdict) }},
+            "drs": ${{ toJson(github.event.client_payload.drs) }}
+          }'
+          echo "$ENTRY" >> "$INDEX_FILE"
+
+      - name: Commit to immutable log (git history = evidence chain)
+        run: |
+          cd logs
+          git config user.name "LOGOS Evidence Registry"
+          git config user.email "registry@logosgs.net"
+          git add .
+          git commit -m "EVIDENCE: $(date -u +%Y-%m-%dT%H:%M:%SZ) | verdict=${{ github.event.client_payload.verdict }} | drs=${{ github.event.client_payload.drs }} | mode=${{ github.event.client_payload.mode }}"
+          git push

@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOGOS Governance Systems | AI Governance & Security Technology</title>
+<meta name="description" content="LOGOS Governance Systems — AI governance and security infrastructure. Sentinel OverWatch protocol and DEP.KEYSTONE dependency verification for enterprise and defense.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&family=Noto+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #000000;
+    --deep: #030508;
+    --abyss: #080d12;
+    --surface: #0d1520;
+    --panel: #111c28;
+    --border: #1a2d40;
+    --border-bright: #2a4a65;
+    --gold: #c8a84b;
+    --gold-dim: #7a6530;
+    --gold-bright: #e8c86b;
+    --cyan: #2af0e0;
+    --cyan-dim: #0d4a44;
+    --red: #e05050;
+    --white: #dde8f0;
+    --muted: #6a8a9a;
+    --mono: 'Share Tech Mono', monospace;
+    --display: 'Rajdhani', sans-serif;
+    --serif: 'Noto Serif', serif;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    background: var(--void);
+    color: var(--white);
+    font-family: var(--display);
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ── CANVAS BACKGROUND ── */
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.15) 2px,
+      rgba(0,0,0,0.15) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--cyan); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--gold); }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 60px;
+    position: relative;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 4rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .hero-eyebrow {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 40px;
+    height: 1px;
+    background: var(--cyan);
+  }
+
+  .hero-title {
+    font-family: var(--display);
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-title .accent { color: var(--gold); }
+  .hero-title .dim { color: var(--muted); }
+
+  .hero-sub {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 0.75rem;
+    max-width: 580px;
+  }
+
+  .covenant-tag {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.12em;
+    font-style: italic;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gold);
+    color: var(--void);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.75rem 1.75rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+
+  .btn-primary:hover {
+    background: var(--gold-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(200,168,75,0.3);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: var(--cyan);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.75rem 1.75rem;
+    border: 1px solid var(--cyan-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--cyan);
+    background: rgba(42, 240, 224, 0.05);
+    box-shadow: 0 0 20px rgba(42, 240, 224, 0.15);
+  }
+
+  /* ── HERO STATUS PANEL ── */
+  .hero-status {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 1.75rem;
+    position: relative;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  }
+
+  .hero-status::before {
+    content: 'SYS.STATUS';
+    position: absolute;
+    top: -1px;
+    left: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--cyan);
+    background: var(--panel);
+    padding: 0 0.5rem;
+    letter-spacing: 0.15em;
+  }
+
+  .status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+  }
+
+  .status-row:last-child { border-bottom: none; }
+
+  .status-label { color: var(--muted); }
+
+  .status-val {
+    color: var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  .dot.gold { background: var(--gold); }
+  .dot.red { background: var(--red); }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ── SECTION COMMON ── */
+  section {
+    position: relative;
+    z-index: 2;
+    padding: 6rem 0;
+  }
+
+  .section-header {
+    margin-bottom: 3.5rem;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: var(--display);
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+    margin-top: 1rem;
+  }
+
+  /* ── TECH CARDS ── */
+  .tech-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .tech-card:hover {
+    border-color: var(--border-bright);
+    box-shadow: 0 0 40px rgba(200,168,75,0.05);
+  }
+
+  .tech-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 100%;
+  }
+
+  .tech-card.sentinel::before { background: linear-gradient(180deg, var(--cyan), var(--cyan-dim)); }
+  .tech-card.keystone::before { background: linear-gradient(180deg, var(--gold), var(--gold-dim)); }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .card-id {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-name {
+    font-family: var(--display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .sentinel .card-name { color: var(--cyan); }
+  .keystone .card-name { color: var(--gold); }
+
+  .card-badge {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid;
+    text-transform: uppercase;
+    white-space: nowrap;
+    align-self: flex-start;
+  }
+
+  .sentinel .card-badge { color: var(--cyan); border-color: var(--cyan-dim); }
+  .keystone .card-badge { color: var(--gold); border-color: var(--gold-dim); }
+
+  .card-desc {
+    font-family: var(--serif);
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 2rem;
+    max-width: 720px;
+  }
+
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .spec-item {
+    background: var(--abyss);
+    border: 1px solid var(--border);
+    padding: 1rem;
+  }
+
+  .spec-key {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .spec-val {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .sentinel .spec-val { color: var(--cyan); }
+  .keystone .spec-val { color: var(--gold); }
+
+  .card-ctas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .demo-link {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── ABOUT ── */
+  #about {
+    background: var(--deep);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .about-body {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--muted);
+  }
+
+  .about-body p { margin-bottom: 1.25rem; }
+  .about-body .highlight { color: var(--white); font-style: italic; }
+
+  .scripture-block {
+    border-left: 3px solid var(--gold);
+    padding: 1.5rem 1.5rem;
+    margin: 2rem 0;
+    background: rgba(200,168,75,0.04);
+  }
+
+  .scripture-text {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-style: italic;
+    color: var(--gold-bright);
+    line-height: 1.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .scripture-ref {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .credentials-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 2rem;
+  }
+
+  .cred-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cred-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .cred-icon {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--gold);
+    min-width: 20px;
+    margin-top: 2px;
+  }
+
+  .cred-text {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .cred-text strong { color: var(--white); }
+
+  /* ── FORMS ── */
+  #contact {
+    background: var(--abyss);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .form-container {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    position: relative;
+  }
+
+  .form-title {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--cyan);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    background: var(--abyss);
+    border: 1px solid var(--border);
+    color: var(--white);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    padding: 0.65rem 0.85rem;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px rgba(200,168,75,0.2);
+  }
+
+  .form-textarea { resize: vertical; min-height: 100px; }
+
+  .form-select option { background: var(--abyss); }
+
+  .checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .checkbox-item input[type="checkbox"] {
+    accent-color: var(--gold);
+    width: 14px;
+    height: 14px;
+  }
+
+  .checkbox-item label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .form-submit {
+    width: 100%;
+    margin-top: 1.5rem;
+    background: var(--gold);
+    color: var(--void);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.85rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+
+  .form-submit:hover {
+    background: var(--gold-bright);
+    box-shadow: 0 6px 25px rgba(200,168,75,0.25);
+  }
+
+  .success-msg {
+    display: none;
+    background: rgba(42, 240, 224, 0.05);
+    border: 1px solid var(--cyan-dim);
+    padding: 1rem;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--cyan);
+    margin-top: 1rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid var(--border);
+    background: var(--void);
+    padding: 3rem 0;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .footer-brand {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-tagline {
+    font-family: var(--serif);
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  .footer-col-title {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .footer-links { list-style: none; }
+  .footer-links li { margin-bottom: 0.5rem; }
+  .footer-links a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--gold); }
+
+  .footer-bottom {
+    max-width: 1100px;
+    margin: 2rem auto 0;
+    padding: 1.5rem 2rem 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    flex-wrap: gap;
+    gap: 1rem;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-in {
+    opacity: 0;
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .delay-1 { animation-delay: 0.15s; }
+  .delay-2 { animation-delay: 0.3s; }
+  .delay-3 { animation-delay: 0.45s; }
+  .delay-4 { animation-delay: 0.6s; }
+  .delay-5 { animation-delay: 0.75s; }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-status { display: none; }
+    .about-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .spec-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── GLITCH TEXT EFFECT ── */
+  .glitch {
+    position: relative;
+    display: inline-block;
+  }
+
+  .glitch::before,
+  .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .glitch::before {
+    color: var(--cyan);
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    transform: translate(-2px, -1px);
+    animation: glitch-1 4s infinite;
+  }
+
+  .glitch::after {
+    color: var(--gold);
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    transform: translate(2px, 1px);
+    animation: glitch-2 4s infinite;
+  }
+
+  @keyframes glitch-1 {
+    0%, 90%, 100% { transform: translate(-2px, -1px) skew(0); opacity: 0; }
+    92% { transform: translate(-4px, -1px) skew(-2deg); opacity: 0.7; }
+    94% { transform: translate(2px, -1px) skew(1deg); opacity: 0; }
+    96% { transform: translate(-2px, -1px) skew(0); opacity: 0.5; }
+  }
+
+  @keyframes glitch-2 {
+    0%, 90%, 100% { transform: translate(2px, 1px) skew(0); opacity: 0; }
+    91% { transform: translate(4px, 1px) skew(2deg); opacity: 0.5; }
+    93% { transform: translate(-2px, 1px) skew(-1deg); opacity: 0; }
+    95% { transform: translate(2px, 1px) skew(0); opacity: 0.4; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#hero" class="nav-logo">LOGOS<span>.</span>GS</a>
+    <ul class="nav-links">
+      <li><a href="#technology">Technology</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">License / Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <p class="hero-eyebrow animate-in">AI Governance & Security Infrastructure</p>
+        <h1 class="hero-title animate-in delay-1">
+          <span class="glitch" data-text="LOGOS">LOGOS</span><br>
+          <span class="dim">Governance</span><br>
+          <span class="accent">Systems</span>
+        </h1>
+        <p class="hero-sub animate-in delay-2">
+          Defense-grade AI governance protocols for enterprise and government.
+          Built on mathematical verification. Proven under adversarial conditions.
+        </p>
+        <p class="covenant-tag animate-in delay-2">// Covenant Protocol Active — Kingdom Authority — FEAR Initiative</p>
+        <div class="hero-ctas animate-in delay-3">
+          <a href="#contact" class="btn-primary">Request License ›</a>
+          <a href="#technology" class="btn-ghost">View Protocols ›</a>
+        </div>
+      </div>
+
+      <div class="hero-status animate-in delay-4">
+        <div class="status-row">
+          <span class="status-label">SENT-OW Status</span>
+          <span class="status-val"><span class="dot"></span>OPERATIONAL</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">DEP.KEYSTONE</span>
+          <span class="status-val"><span class="dot"></span>VERIFIED</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Dual Cordon</span>
+          <span class="status-val"><span class="dot gold"></span>ACTIVE</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Red-Team Result</span>
+          <span class="status-val">100% INTEGRITY</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Covenant Protocol</span>
+          <span class="status-val"><span class="dot gold"></span>ACTIVE</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">FEAR Initiative</span>
+          <span class="status-val"><span class="dot gold"></span>FUNDED</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Provisional Patent</span>
+          <span class="status-val">FILED</span>
+        </div>
+        <div class="status-row">
+          <span class="status-label">Corp. Status</span>
+          <span class="status-val">DE C-CORP IN FORM.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TECHNOLOGY ── -->
+<section id="technology">
+  <div class="container">
+    <div class="section-header animate-in">
+      <p class="section-label">// Protocol Portfolio</p>
+      <h2 class="section-title">Core Technologies</h2>
+      <div class="divider"></div>
+    </div>
+
+    <!-- SENT-OW -->
+    <div class="tech-card sentinel animate-in">
+      <div class="card-header">
+        <div>
+          <p class="card-id">PROTOCOL.001 — SENT-OW-v1</p>
+          <h3 class="card-name">Sentinel OverWatch™</h3>
+        </div>
+        <span class="card-badge">Dual-Cordon Active</span>
+      </div>
+      <p class="card-desc">
+        A dual-cordon AI governance layer that intercepts, classifies, and enforces policy compliance
+        at the LLM inference boundary. Sentinel OverWatch combines semantic analysis with
+        mathematical dependency verification to provide provable governance integrity
+        under adversarial conditions — including prompt injection, semantic drift, delimiter bypass,
+        persona jailbreak, and DDoS-class throughput attacks.
+      </p>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <p class="spec-key">Architecture</p>
+          <p class="spec-val">Dual-Cordon</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Red-Team Result</p>
+          <p class="spec-val">100% Pass</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Vectors Tested</p>
+          <p class="spec-val">7 Categories</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Escalation Levels</p>
+          <p class="spec-val">L1 → L4 DDoS</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Integration</p>
+          <p class="spec-val">API / Pipeline</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Patent Status</p>
+          <p class="spec-val">Prov. Filed</p>
+        </div>
+      </div>
+      <div class="card-ctas">
+        <a href="https://sentinel.logosgs.net" class="btn-primary" target="_blank">Live Demo ›</a>
+        <a href="#contact" class="btn-ghost">Request License ›</a>
+        <span class="demo-link">→ sentinel.logosgs.net</span>
+      </div>
+    </div>
+
+    <!-- DEP.KEYSTONE -->
+    <div class="tech-card keystone animate-in">
+      <div class="card-header">
+        <div>
+          <p class="card-id">PROTOCOL.002 — DEP.KEYSTONE-v1</p>
+          <h3 class="card-name">DEP.KEYSTONE™</h3>
+        </div>
+        <span class="card-badge">Math Verified</span>
+      </div>
+      <p class="card-desc">
+        A mathematical dependency verification system that creates cryptographically-anchored
+        proof of protocol integrity across the AI governance pipeline. DEP.KEYSTONE ensures
+        that governance components cannot be silently modified, bypassed, or substituted —
+        providing a verifiable chain of custody from policy definition to enforcement.
+        The mathematical foundation underpins Sentinel OverWatch's provable resilience claims.
+      </p>
+      <div class="spec-grid">
+        <div class="spec-item">
+          <p class="spec-key">Verification</p>
+          <p class="spec-val">Mathematical</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Chain of Custody</p>
+          <p class="spec-val">End-to-End</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Tamper Detection</p>
+          <p class="spec-val">Cryptographic</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Audit Trail</p>
+          <p class="spec-val">Immutable</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Compliance</p>
+          <p class="spec-val">SOC2 / CMMC</p>
+        </div>
+        <div class="spec-item">
+          <p class="spec-key">Patent Status</p>
+          <p class="spec-val">Prov. Filed</p>
+        </div>
+      </div>
+      <div class="card-ctas">
+        <a href="https://keystone.logosgs.net" class="btn-primary" target="_blank">Live Demo ›</a>
+        <a href="#contact" class="btn-ghost">Request License ›</a>
+        <span class="demo-link">→ keystone.logosgs.net</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div>
+        <div class="section-header">
+          <p class="section-label">// About LOGOS GS</p>
+          <h2 class="section-title">Built on Covenant.<br>Deployed for the Field.</h2>
+          <div class="divider"></div>
+        </div>
+        <div class="about-body">
+          <p>
+            LOGOS Governance Systems is a Delaware C-Corporation developing breakthrough
+            AI governance and security infrastructure. Founded by a disabled Army veteran
+            and cavalry scout, every protocol we build carries a military-grade commitment
+            to integrity, verifiability, and zero-compromise performance.
+          </p>
+          <p>
+            Our work is governed by the <span class="highlight">Covenant Protocol</span> —
+            an operating framework integrating stewardship principles into every
+            technical and business decision. All proceeds fund the
+            <span class="highlight">FEAR Initiative</span>: Faith, Endurance, Adrenaline,
+            Resilience — a veteran dual-diagnosis recovery program.
+          </p>
+          <p>
+            We are not building tools for convenience. We are building infrastructure
+            for the age when AI governance failures carry real-world consequences.
+          </p>
+          <div class="scripture-block">
+            <p class="scripture-text">"With your help I can advance against a troop;<br>with my God I can scale a wall."</p>
+            <p class="scripture-ref">— Psalm 18:29</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="credentials-panel">
+        <p class="cred-label">Operator Credentials</p>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Founder:</strong> David W. Smith (DJ) — Disabled U.S. Army Veteran, Cavalry Scout, Ret. Sergeant</p>
+        </div>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Entity:</strong> LOGOS Governance Systems Inc. — Delaware C-Corp (in formation)</p>
+        </div>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Location:</strong> Dothan, AL — Operational</p>
+        </div>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Patent:</strong> Provisional patents filed — SENT-OW, DEP.KEYSTONE, Foundation Ship™ Optical Computing</p>
+        </div>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Validation:</strong> Internal red-team battery complete. 100% governance integrity across 7 adversarial vector categories.</p>
+        </div>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Mission:</strong> FEAR Initiative — veteran dual-diagnosis recovery funded through technology licensing</p>
+        </div>
+        <div class="cred-item">
+          <span class="cred-icon">▸</span>
+          <p class="cred-text"><strong>Target Markets:</strong> DoD / Defense-adjacent, Enterprise AI Ops, Healthcare AI Governance</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT / LICENSE ── -->
+<section id="contact">
+  <div class="container">
+    <div class="section-header">
+      <p class="section-label">// License & Contact</p>
+      <h2 class="section-title">Engage with LOGOS GS</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="form-grid">
+
+      <!-- LICENSE REQUEST -->
+      <div class="form-container">
+        <p class="form-title">// License Request</p>
+        <form id="license-form">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-input" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Organization *</label>
+            <input type="text" class="form-input" name="org" required placeholder="Company / Agency">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role / Title *</label>
+            <input type="text" class="form-input" name="role" required placeholder="CISO / CTO / Program Manager">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" name="email" required placeholder="secure@org.gov">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Product Interest</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" id="lic-sentow" name="product_sentow">
+                <label for="lic-sentow">Sentinel OverWatch™ (SENT-OW)</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="lic-keystone" name="product_keystone">
+                <label for="lic-keystone">DEP.KEYSTONE™</label>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" id="lic-bundle" name="product_bundle">
+                <label for="lic-bundle">Full Governance Stack (Bundle)</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Use Case</label>
+            <select class="form-select" name="use_case">
+              <option value="">Select use case</option>
+              <option>DoD / Defense Program</option>
+              <option>Enterprise AI Ops</option>
+              <option>Healthcare AI Governance</option>
+              <option>Security Research</option>
+              <option>Red-Team Partnership</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Brief Description</label>
+            <textarea class="form-textarea" name="description" placeholder="Describe your governance challenge or deployment context..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">Submit License Request ›</button>
+          <div class="success-msg" id="license-success">
+            ✓ Request received. You will be contacted within 48 hours.
+          </div>
+        </form>
+      </div>
+
+      <!-- CONTACT / RED-TEAM INQUIRY -->
+      <div class="form-container">
+        <p class="form-title">// Contact & Red-Team Inquiry</p>
+        <form id="contact-form">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" class="form-input" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Organization</label>
+            <input type="text" class="form-input" name="org" placeholder="Company / Institution">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email *</label>
+            <input type="email" class="form-input" name="email" required placeholder="contact@firm.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Inquiry Type</label>
+            <select class="form-select" name="inquiry_type">
+              <option value="">Select type</option>
+              <option>Pilot Opportunity</option>
+              <option>Red-Team Partnership (Trade Proposal)</option>
+              <option>Media / Press</option>
+              <option>Investment Inquiry</option>
+              <option>DoD / Government Program</option>
+              <option>General</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message *</label>
+            <textarea class="form-textarea" name="message" required style="min-height:160px;" placeholder="Describe your inquiry. Red-team trade proposals and pilot opportunities receive priority response."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">How did you hear about us?</label>
+            <select class="form-select" name="source">
+              <option value="">Select</option>
+              <option>DoD / Government referral</option>
+              <option>Security community</option>
+              <option>Web search</option>
+              <option>LinkedIn</option>
+              <option>Referral</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <button type="submit" class="form-submit">Send Message ›</button>
+          <div class="success-msg" id="contact-success">
+            ✓ Message received. We'll respond within 24-48 hours.
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">LOGOS Governance Systems</p>
+      <p class="footer-tagline">AI governance infrastructure built on Covenant. Every license funds veteran recovery.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Protocols</p>
+      <ul class="footer-links">
+        <li><a href="https://sentinel.logosgs.net" target="_blank">Sentinel OverWatch™</a></li>
+        <li><a href="https://keystone.logosgs.net" target="_blank">DEP.KEYSTONE™</a></li>
+        <li><a href="#contact">License Request</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Company</p>
+      <ul class="footer-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#about">FEAR Initiative</a></li>
+        <li><a href="#contact">Red-Team Inquiry</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 LOGOS Governance Systems Inc. — All Rights Reserved</span>
+    <span>Delaware C-Corp In Formation | Dothan, AL</span>
+    <span>Covenant Protocol Active</span>
+  </div>
+</footer>
+
+<script>
+// ── CANVAS PARTICLE FIELD ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], lines = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function initParticles() {
+  particles = [];
+  const count = Math.floor((W * H) / 18000);
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.15,
+      vy: (Math.random() - 0.5) * 0.15,
+      r: Math.random() * 1.2 + 0.3,
+      opacity: Math.random() * 0.4 + 0.1
+    });
+  }
+}
+
+function drawFrame() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(26, 45, 64, 0.4)';
+  ctx.lineWidth = 0.5;
+  const gridSize = 80;
+  for (let x = 0; x < W; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+  }
+  for (let y = 0; y < H; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+
+  // Particles + connections
+  particles.forEach((p, i) => {
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x < 0 || p.x > W) p.vx *= -1;
+    if (p.y < 0 || p.y > H) p.vy *= -1;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(200, 168, 75, ${p.opacity})`;
+    ctx.fill();
+
+    // Connect nearby particles
+    for (let j = i + 1; j < particles.length; j++) {
+      const q = particles[j];
+      const dx = p.x - q.x;
+      const dy = p.y - q.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        const alpha = (1 - dist / 120) * 0.15;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(42, 240, 224, ${alpha})`;
+        ctx.lineWidth = 0.5;
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(q.x, q.y);
+        ctx.stroke();
+      }
+    }
+  });
+
+  requestAnimationFrame(drawFrame);
+}
+
+window.addEventListener('resize', () => { resize(); initParticles(); });
+resize();
+initParticles();
+drawFrame();
+
+// ── SCROLL ANIMATIONS ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+      entry.target.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.tech-card, .form-container, .credentials-panel, .about-body').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  observer.observe(el);
+});
+
+// ── FORM HANDLING ──
+function handleForm(formId, successId) {
+  document.getElementById(formId).addEventListener('submit', function(e) {
+    e.preventDefault();
+    const data = new FormData(this);
+    const payload = {};
+    data.forEach((val, key) => payload[key] = val);
+    console.log(`[${formId}] Submission:`, payload);
+    // Replace with actual endpoint: fetch('/api/submit', { method: 'POST', body: JSON.stringify(payload) })
+    document.getElementById(successId).style.display = 'block';
+    this.reset();
+    setTimeout(() => document.getElementById(successId).style.display = 'none', 8000);
+  });
+}
+
+handleForm('license-form', 'license-success');
+handleForm('contact-form', 'contact-success');
+</script>
+</body>
+</html>
